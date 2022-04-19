@@ -28,21 +28,25 @@ namespace Asguho.HttpLib {
             Regex regexDir = new Regex("dir.*?<a href=\"(http:|https:)?(?<dir>.*?)\"", RegexOptions.IgnoreCase);
 
             string html = ReadHtmlContentFromUrl(baseUrl);
-            //Files
+            //Files         
             MatchCollection matchesFile = regexFile.Matches(html);
             if (matchesFile.Count != 0)
                 foreach (Match match in matchesFile)
                     if (match.Success)
                         pathInfos.Add(
-                            new PathInfo(rootUrl + match.Groups["file"], false));
+                            new PathInfo(baseUrl + match.Groups["file"], false));
             //Dir
             MatchCollection matchesDir = regexDir.Matches(html);
             if (matchesDir.Count != 0)
                 foreach (Match match in matchesDir)
                     if (match.Success) {
-                        var dirInfo = new PathInfo(rootUrl + match.Groups["dir"], true);
-                        GetAllFilePathAndSubDirectory(dirInfo.AbsoluteUrlStr, dirInfo.Childs);
-                        pathInfos.Add(dirInfo);
+                        if (match.Groups["dir"].ToString() != "/minecraft/") {
+                            var dirInfo = new PathInfo(baseUrl + match.Groups["dir"], true);
+                            //GetAllFilePathAndSubDirectory(dirInfo.AbsoluteUrlStr, dirInfo.Childs);
+                            pathInfos.Add(dirInfo);
+
+                        }
+
                     }
 
         }
