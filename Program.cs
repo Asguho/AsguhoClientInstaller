@@ -8,6 +8,7 @@ using System.IO;
 using System.IO.Compression;
 using System.Net;
 using System.Runtime.InteropServices.ComTypes;
+using System.Text.RegularExpressions;
 
 namespace AsguhoClientInstaller {
     internal class Program {
@@ -27,6 +28,7 @@ namespace AsguhoClientInstaller {
 
         static void setup() {
             FolderUtil.createIfNone(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\.asguho");
+            downloadMods();
             downloadMultiMC();
             createInstance("testclient");
             createShortcut();
@@ -81,8 +83,11 @@ namespace AsguhoClientInstaller {
             var _webClient = new WebClient();
             _webClient.DownloadFile("https://www.asguho.dk/minecraft/client/1.18.2/mods.txt", Directory.GetCurrentDirectory() + "\\temp\\mods.txt");
             string[] modUrls = File.ReadAllLines(Directory.GetCurrentDirectory() + "\\temp\\mods.txt");
+            Regex regexFile = new Regex("https://modrinth.com/mod/.(<file>)./", RegexOptions.IgnoreCase);
             foreach (string modUrl in modUrls) {
-                _webClient.DownloadFile(modUrl, Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\.asguho\\MultiMC\\instances\\testclient\\mods\\"+modUrl +".jar");
+                Console.WriteLine(modUrl);
+                Directory.CreateDirectory(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\.asguho\\MultiMC\\instances\\testclient\\mods\\");
+                _webClient.DownloadFile(modUrl, Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\.asguho\\MultiMC\\instances\\testclient\\mods\\"+modUrl+".jar");
             }
         }
     }
