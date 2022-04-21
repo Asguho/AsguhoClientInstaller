@@ -29,7 +29,7 @@ namespace Asguho.ConfigGenerator {
             "ShownNotifications="
             };
             lines[9] = "MaxMemAlloc=" + getRam().ToString();
-            lines[10] = "MinMemAlloc=" + (getRam() * 0.20).ToString();
+            lines[10] = "MinMemAlloc=" + (Math.Floor(getRam() * 0.20)).ToString();
             File.WriteAllLines(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\.asguho\\MultiMC\\multimc.cfg", lines);
         }
     }
