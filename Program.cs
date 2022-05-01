@@ -71,13 +71,12 @@ namespace AsguhoClientInstaller {
                     ZipFile.ExtractToDirectory(_myTempDir + "\\_multiMC.zip", _myTempDir + "\\_multiMC\\");
                 }
                 FolderUtil.CopyDirectory(_myTempDir + "\\_multiMC\\MultiMC", Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\.asguho\\MultiMC\\", true);
-
-                //copy from MultiMCTemplate to the new MuiltiMC folder
-                MultiMCConfigcreator.createMultiMCConfig();
-                //_webClient.DownloadFile("https://www.asguho.dk/minecraft/client/MultiMCInstance/multimc.cfg", Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\.asguho\\MultiMC\\multimc.cfg");
-                //FolderUtil.copyAllFilesFromFolder(Directory.GetCurrentDirectory() + "\\MultiMCTemplate\\", Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\.asguho\\MultiMC\\");
-                //FolderUtil.copyAllDirectorysFromFolder(Directory.GetCurrentDirectory() + "\\MultiMCTemplate", Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\.asguho\\MultiMC\\");
             }
+            //copy from MultiMCTemplate to the new MuiltiMC folder
+            MultiMCConfigcreator.createMultiMCConfig();
+            //_webClient.DownloadFile("https://www.asguho.dk/minecraft/client/MultiMCInstance/multimc.cfg", Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\.asguho\\MultiMC\\multimc.cfg");
+            //FolderUtil.copyAllFilesFromFolder(Directory.GetCurrentDirectory() + "\\MultiMCTemplate\\", Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\.asguho\\MultiMC\\");
+            //FolderUtil.copyAllDirectorysFromFolder(Directory.GetCurrentDirectory() + "\\MultiMCTemplate", Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\.asguho\\MultiMC\\");
         }
         static void downloadMods() {
             var _webClient = new WebClient();
