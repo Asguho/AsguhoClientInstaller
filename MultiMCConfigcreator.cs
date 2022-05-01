@@ -15,28 +15,11 @@ namespace Asguho.ConfigGenerator {
             return 8000;
         }
         public static void createMultiMCConfig() {
-            string[] lines ={
-            "Analytics=false",
-            "AnalyticsClientID=",
-            "AnalyticsSeen=",
-            "JavaPath=javaw",
-            "Language=en_US",
-            "LastHostname=",
-            "MainWindowGeometry=",
-            "MainWindowState=",
-            "MaxMemAlloc=1024",
-            "MinMemAlloc=512",
-            "ShownNotifications="
-            };
-            string[] lines2 ={
-                "Analytics=false", "AnalyticsClientID=", "AutoCloseConsole=", "AutoUpdate=", "CentralModsDir=", "ConsoleFont=", "ConsoleFontSize=", "ConsoleMaxLines=", "ConsoleOverflowStop=", "IconTheme=", "IconsDir=", "InstSortMode=", "InstanceDir=instances", "JProfilerPath=", "JVisualVMPath=", "JavaPath=javaw", "JsonEditor=", "JvmArgs=", "Language=en_US", "LastHostname=", "LaunchMaximized=", "MCEditPath=", "MainWindowGeometry=", "MainWindowState=", "MaxMemAlloc=1024", "MinMemAlloc=512", "MinecraftWinHeight=", "MinecraftWinWidth=", "PagedGeometry=", "PasteEEAPIKey=", "PermGen=18", "PostExitCommand=", "PreLaunchCommand=", "ProxyAddr=", "ProxyPass=", "ProxyPort=", "ProxyType=", "ProxyUser=", "RecordGameTime=", "ShowConsole=", "ShowConsoleOnError=", "ShowGameTime=", "ShowGlobalGameTime=", "ShownNotifications=", "UpdateChannel=", "UseNativeGLFW=", "UseNativeOpenAL=", "WrapperCommand="            
-            };
-            //lines[9] = "MaxMemAlloc=" + getRam().ToString();
-            //lines[10] = "MinMemAlloc=" + (Math.Floor(getRam() * 0.20)).ToString();
-            lines2[25] = "MaxMemAlloc=" + getRam().ToString();
-            lines2[26] = "MinMemAlloc=" + (Math.Floor(getRam() * 0.20)).ToString();
+            string[] lines2 = {"Analytics=false", "AnalyticsClientID=", "AutoCloseConsole=", "AutoUpdate=", "CentralModsDir=", "ConsoleFont=", "ConsoleFontSize=", "ConsoleMaxLines=", "ConsoleOverflowStop=", "IconTheme=", "IconsDir=", "InstSortMode=", "InstanceDir=instances", "JProfilerPath=", "JVisualVMPath=", "JavaArchitecture=", "JavaPath=javaw", "JavaTimestamp=", "JavaVersion=", "JsonEditor=", "JvmArgs=", "Language=en_US", "LastHostname=AskeDesktop", "LaunchMaximized=true", "MCEditPath=", "MainWindowGeometry=", "MainWindowState=", "MaxMemAlloc=", "MinMemAlloc=", "MinecraftWinHeight=", "MinecraftWinWidth=", "PagedGeometry=", "PasteEEAPIKey=", "PermGen=", "PostExitCommand=", "PreLaunchCommand=", "ProxyAddr=", "ProxyPass=", "ProxyPort=", "ProxyType=", "ProxyUser=", "RecordGameTime=", "ShowConsole=false", "ShowConsoleOnError=", "ShowGameTime=", "ShowGlobalGameTime=", "ShownNotifications=", "UpdateChannel=", "UseNativeGLFW=", "UseNativeOpenAL=", "WrapperCommand="
+             };
+            lines2[27] = "MaxMemAlloc=" + getRam().ToString();
+            lines2[28] = "MinMemAlloc=" + (Math.Floor(getRam() * 0.20)).ToString();
             File.WriteAllLines(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\.asguho\\MultiMC\\multimc.cfg", lines2);
         }
-    }
-}
+    }}
 
