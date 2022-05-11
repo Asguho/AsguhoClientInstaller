@@ -24,31 +24,34 @@ namespace Asguho.HttpLib {
             string rootUrl = baseUri.GetLeftPart(UriPartial.Authority);
 
 
-            Regex regexFile = new Regex("[0-9] <a href=\"(http:|https:)?(?<file>.*?)\"", RegexOptions.IgnoreCase);
-            Regex regexDir = new Regex("dir.*?<a href=\"(http:|https:)?(?<dir>.*?)\"", RegexOptions.IgnoreCase);
+            Regex regexFile = new Regex("alt.*?></td><td><a href=\"(http:|https:)?(?<file>.*?)\"", RegexOptions.IgnoreCase);
+            Regex regexDir = new Regex("dir.*?></td><td><a href=\"(http:|https:)?(?<dir>.*?)\"", RegexOptions.IgnoreCase);
 
             string html = ReadHtmlContentFromUrl(baseUrl);
             //Files         
             MatchCollection matchesFile = regexFile.Matches(html);
-            if (matchesFile.Count != 0)
-                foreach (Match match in matchesFile)
-                    if (match.Success)
-                        pathInfos.Add(
-                            new PathInfo(baseUrl + match.Groups["file"], false));
+            if (matchesFile.Count != 0) {
+                foreach (Match match in matchesFile) {
+                    if (match.Success) {
+                        Console.WriteLine($"added file: " + match.Groups["file"].ToString());
+                        pathInfos.Add(new PathInfo(baseUrl + match.Groups["file"], false));
+                    }
+                }
+            }
             //Dir
             MatchCollection matchesDir = regexDir.Matches(html);
-            if (matchesDir.Count != 0)
-                foreach (Match match in matchesDir)
+            if (matchesDir.Count != 0) {
+                foreach (Match match in matchesDir) {
                     if (match.Success) {
                         if (match.Groups["dir"].ToString() != "/minecraft/") {
+                            Console.WriteLine("added dir: " + match.Groups["dir"].ToString());
                             var dirInfo = new PathInfo(baseUrl + match.Groups["dir"], true);
                             //GetAllFilePathAndSubDirectory(dirInfo.AbsoluteUrlStr, dirInfo.Childs);
                             pathInfos.Add(dirInfo);
-
                         }
-
                     }
-
+                }
+            }
         }
 
 
@@ -72,21 +75,13 @@ namespace Asguho.HttpLib {
 
         public Uri AbsoluteUrl { get; set; }
 
-        public string AbsoluteUrlStr {
-            get { return AbsoluteUrl.ToString(); }
-        }
+        public string AbsoluteUrlStr => AbsoluteUrl.ToString();
 
-        public string RootUrl {
-            get { return AbsoluteUrl.GetLeftPart(UriPartial.Authority); }
-        }
+        public string RootUrl => AbsoluteUrl.GetLeftPart(UriPartial.Authority);
 
-        public string RelativeUrl {
-            get { return AbsoluteUrl.PathAndQuery; }
-        }
+        public string RelativeUrl => AbsoluteUrl.PathAndQuery;
 
-        public string Query {
-            get { return AbsoluteUrl.Query; }
-        }
+        public string Query => AbsoluteUrl.Query;
 
         public bool IsDir { get; set; }
         public List<PathInfo> Childs { get; set; }

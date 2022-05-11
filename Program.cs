@@ -15,11 +15,11 @@ namespace AsguhoClientInstaller {
         static void Main(string[] args) {
             Console.WriteLine("Setting up AsguhoClient!");
 
-            //List<PathInfo> pathInfos = new List<PathInfo>();
-            //HttpHelper.GetAllFilePathAndSubDirectory("https://www.asguho.dk/minecraft/client/", pathInfos);
-            //HttpHelper.PrintAllPathInfo(pathInfos);
+            List<PathInfo> pathInfos = new List<PathInfo>();
+            HttpHelper.GetAllFilePathAndSubDirectory("https://www.asguho.dk/minecraft/client/", pathInfos);
+            HttpHelper.PrintAllPathInfo(pathInfos);
 
-            setup();
+            //setup();
 
 
             Console.WriteLine("press any key to exit");
@@ -32,7 +32,10 @@ namespace AsguhoClientInstaller {
             createInstance("testclient");
             downloadMods();
             createShortcut();
+            FolderUtil.deleteTempFolder();
         }
+
+
         static void createShortcut() {
             IShellLink link = (IShellLink)new ShellLink();
 
@@ -52,19 +55,19 @@ namespace AsguhoClientInstaller {
             FolderUtil.createIfNone(_instanceFolder);
             var _webClient = new WebClient();
             //copy from instanceTemplate to the new instance
-            _webClient.DownloadFile("https://www.asguho.dk/minecraft/client/InstanceTemplate/instance.cfg", _instanceFolder+"instance.cfg");
-            _webClient.DownloadFile("https://www.asguho.dk/minecraft/client/InstanceTemplate/mmc-pack.json", _instanceFolder+"mmc-pack.json");
+            _webClient.DownloadFile("https://www.asguho.dk/minecraft/client/InstanceTemplate/instance.cfg", _instanceFolder + "instance.cfg");
+            _webClient.DownloadFile("https://www.asguho.dk/minecraft/client/InstanceTemplate/mmc-pack.json", _instanceFolder + "mmc-pack.json");
             //FolderUtil.copyAllFilesFromFolder(Directory.GetCurrentDirectory() + "\\instanceTemplate\\", _instanceFolder);
         }
         static void downloadMultiMC() {
-            if (!Directory.Exists(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\.asguho\\MultiMC\\")) {
+            if (!File.Exists(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\.asguho\\MultiMC\\MultiMC.exe")) {
                 var _webClient = new WebClient();
 
-                string _myTempDir = System.IO.Directory.GetCurrentDirectory() + "\\temp\\";
+                string _myTempDir = FolderUtil.getTempFolder();
                 FolderUtil.createIfNone(_myTempDir);
 
                 if (!File.Exists(_myTempDir + "\\_multiMC.zip")) {
-                        _webClient.DownloadFile("https://files.multimc.org/downloads/mmc-stable-win32.zip", _myTempDir + "\\_multiMC.zip");
+                    _webClient.DownloadFile("https://files.multimc.org/downloads/mmc-stable-win32.zip", _myTempDir + "\\_multiMC.zip");
                 }
 
                 if (!Directory.Exists(_myTempDir + "\\_multiMC\\")) {
@@ -78,22 +81,47 @@ namespace AsguhoClientInstaller {
             //FolderUtil.copyAllFilesFromFolder(Directory.GetCurrentDirectory() + "\\MultiMCTemplate\\", Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\.asguho\\MultiMC\\");
             //FolderUtil.copyAllDirectorysFromFolder(Directory.GetCurrentDirectory() + "\\MultiMCTemplate", Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\.asguho\\MultiMC\\");
         }
+        //static void downloadMods() {
+        //    var _webClient = new WebClient();
+        //    _webClient.DownloadFile("https://www.asguho.dk/minecraft/client/1.18.2/mods.txt", FolderUtil.getTempFolder()+"mods.txt");
+        //    string[] modUrls = File.ReadAllLines(FolderUtil.getTempFolder()+"mods.txt");
+        //    Regex regexFile = new Regex("https://modrinth.com/mod/.(<file>)./", RegexOptions.IgnoreCase);
+        //    Directory.CreateDirectory(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\.asguho\\MultiMC\\instances\\testclient\\.minecraft\\");
+        //    Directory.CreateDirectory(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\.asguho\\MultiMC\\instances\\testclient\\.minecraft\\mods\\");
+        //    foreach (string modUrl in modUrls) {
+        //        Console.WriteLine(useRegex(modUrl)+" "+modUrl);
+        //        _webClient.DownloadFile(modUrl, Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\.asguho\\MultiMC\\instances\\testclient\\.minecraft\\mods\\"+modUrl.Replace("https://cdn.modrinth.com/data/", "").Replace("/version/","-").Replace("/","-"));
+        //    }
+        //}
         static void downloadMods() {
             var _webClient = new WebClient();
-            _webClient.DownloadFile("https://www.asguho.dk/minecraft/client/1.18.2/mods.txt", Directory.GetCurrentDirectory() + "\\temp\\mods.txt");
-            string[] modUrls = File.ReadAllLines(Directory.GetCurrentDirectory() + "\\temp\\mods.txt");
+            _webClient.DownloadFile("https://www.asguho.dk/minecraft/client/1.18.2/mods.txt", FolderUtil.getTempFolder() + "mods.txt");
+            string[] modUrls = File.ReadAllLines(FolderUtil.getTempFolder() + "mods.txt");
             Regex regexFile = new Regex("https://modrinth.com/mod/.(<file>)./", RegexOptions.IgnoreCase);
             Directory.CreateDirectory(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\.asguho\\MultiMC\\instances\\testclient\\.minecraft\\");
             Directory.CreateDirectory(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\.asguho\\MultiMC\\instances\\testclient\\.minecraft\\mods\\");
             foreach (string modUrl in modUrls) {
-                Console.WriteLine(useRegex(modUrl)+" "+modUrl);
-                Console.WriteLine(modUrl);
-                _webClient.DownloadFile(modUrl, Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\.asguho\\MultiMC\\instances\\testclient\\.minecraft\\mods\\"+modUrl.Replace("https://cdn.modrinth.com/data/", "").Replace("/version/","-").Replace("/","-"));
+                downloadFileAsync(modUrl, Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\.asguho\\MultiMC\\instances\\testclient\\.minecraft\\mods\\" + modUrl.Replace("https://cdn.modrinth.com/data/", "").Replace("/version/", "-").Replace("/", "-"));
             }
+        }
+        static void downloadFileAsync(string url, string filePath) {
+            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
+            request.Method = "GET";
+            request.ContentType = "application/x-www-form-urlencoded";
+            request.BeginGetResponse(new AsyncCallback(delegate (IAsyncResult ar) {
+                HttpWebResponse response = (HttpWebResponse)request.EndGetResponse(ar);
+                using (Stream stream = response.GetResponseStream()) {
+                    Console.WriteLine("downloading from: " + url);
+                    using (FileStream fileStream = new FileStream(filePath, FileMode.Create)) {
+                        stream.CopyTo(fileStream);
+                    }
+                }
+            }), null);
         }
         public static bool useRegex(String input) {
             Regex regex = new Regex("https://cdn\\.modrinth\\.com/data/[a-zA-Z]+/versions/[a-zA-Z]+([0-9]+(\\.[0-9]+)+)-(\\d(\\.\\d)+)/([a-zA-Z]+(-[a-zA-Z]+)+)([0-9]+(\\.[0-9]+)+)-(\\d(\\.\\d)+)\\.jar", RegexOptions.IgnoreCase);
             return regex.IsMatch(input);
         }
+
     }
 }

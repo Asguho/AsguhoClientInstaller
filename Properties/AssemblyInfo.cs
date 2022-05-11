@@ -5,7 +5,7 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("AsguhoClientInstaller")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyDescription("Installer for the asguho client")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("AsguhoClientInstaller")]
@@ -19,7 +19,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("085fdf96-ec2a-45e7-bcad-9bc327e900da")]
+[assembly: Guid("185fdf96-ec2a-45e7-bcad-9bc327e900db")]
 
 // Version information for an assembly consists of the following four values:
 //

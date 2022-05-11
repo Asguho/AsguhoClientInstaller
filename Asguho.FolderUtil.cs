@@ -10,11 +10,19 @@ namespace Asguho.FolderUtil {
                 Console.WriteLine("the folder: " + folderPath + " already exits");
             }
         }
+        public static void deleteIfExists(string folderPath) {
+            if (Directory.Exists(folderPath)) {
+                Directory.Delete(folderPath, true);
+            }
+            else {
+                Console.WriteLine("the folder: " + folderPath + " already exits");
+            }
+        }
+        public static void deleteTempFolder() {
+            deleteIfExists(getTempFolder());
+        }
         public static void copyAllDirectorysFromFolder(string sourcePath, string destPath) {
-            Console.WriteLine(sourcePath);
-            Console.WriteLine(Directory.GetDirectories(sourcePath));
             foreach (string _targetDirectoriy in Directory.GetDirectories(sourcePath)) {
-                Console.WriteLine(_targetDirectoriy);
                 if (!File.Exists(destPath + _targetDirectoriy.ToString().Replace(sourcePath, ""))) {
                     CopyDirectory(_targetDirectoriy, destPath + _targetDirectoriy.ToString().Replace(sourcePath, ""), true);
                 }
@@ -24,8 +32,9 @@ namespace Asguho.FolderUtil {
             // Get information about the source directory
             var dir = new DirectoryInfo(sourceDir);
             // Check if the source directory exists
-            if (!dir.Exists)
+            if (!dir.Exists) {
                 throw new DirectoryNotFoundException($"Source directory not found: {dir.FullName}");
+            }
             // Cache directories before we start copying
             DirectoryInfo[] dirs = dir.GetDirectories();
             // Create the destination directory
@@ -49,6 +58,11 @@ namespace Asguho.FolderUtil {
                     File.Copy(_file, destPath + _file.ToString().Replace(sourcePath, ""));
                 }
             }
+        }
+        public static string getTempFolder() {
+            string _myTempDir = Path.GetTempPath() + ".asguho\\";
+            FolderUtil.createIfNone(_myTempDir);
+            return _myTempDir;
         }
     }
 }

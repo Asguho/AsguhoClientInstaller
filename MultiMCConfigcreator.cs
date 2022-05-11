@@ -20,11 +20,13 @@ namespace Asguho.ConfigGenerator {
             string configPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\.asguho\\MultiMC\\multimc.cfg";
             _webClient.DownloadFile("https://www.asguho.dk/minecraft/client/MultiMCInstance/multimc.cfg", configPath);
             string[] configString = File.ReadAllLines(configPath);
+            int _ram = getRam();
             for (int i = 0; i < configString.Length; i++) {
-                configString[i]=configString[i].Replace("[MAXRAM]", getRam().ToString());
-                configString[i]=configString[i].Replace("[MINRAM]", (Math.Floor(getRam() * 0.20)).ToString());
+                configString[i] = configString[i].Replace("[MAXRAM]", _ram.ToString());
+                configString[i] = configString[i].Replace("[MINRAM]", (Math.Floor(_ram * 0.20)).ToString());
             }
             File.WriteAllLines(configPath, configString);
         }
-    }}
+    }
+}
 
