@@ -48,20 +48,6 @@ namespace Asguho.HttpLib {
                     }
                 }
             }
-            //Dir
-            //MatchCollection matchesDir = regexDir.Matches(html);
-            //if (matchesDir.Count != 0) {
-            //    foreach (Match match in matchesDir) {
-            //        if (match.Success) {
-            //            if (match.Groups["dir"].ToString() != "/minecraft/") {
-            //                Console.WriteLine("added dir: " + match.Groups["dir"].ToString());
-            //                var dirInfo = new PathInfo(baseUrl + match.Groups["dir"], true);
-            //                //GetAllFilePathAndSubDirectory(dirInfo.AbsoluteUrlStr, dirInfo.Childs);
-            //                pathInfos.Add(dirInfo);
-            //            }
-            //        }
-            //    }
-            //}
         }
 
 
@@ -88,6 +74,8 @@ namespace Asguho.HttpLib {
 
         public string Date { get; }
 
+        public DateTime DateTime => toDateTime();
+
         public string AbsoluteUrlStr => AbsoluteUrl.ToString();
 
         public string RootUrl => AbsoluteUrl.GetLeftPart(UriPartial.Authority);
@@ -102,6 +90,26 @@ namespace Asguho.HttpLib {
 
         public override string ToString() {
             return String.Format("{0} IsDir {1} ChildCount {2} AbsUrl {3}", RelativeUrl, IsDir, Childs.Count, AbsoluteUrlStr);
+        }
+        private DateTime toDateTime() {
+            //Console.WriteLine(Date);
+            Regex regex = new Regex("(?<year>[0-9]+)-(?<month>[0-9]+)-(?<day>[0-9]+) (?<hour>[0-9]+):(?<minute>[0-9]+)", RegexOptions.IgnoreCase);
+            Match matche = regex.Match(Date);
+
+            if (matche.Success) {
+                //convert string to int
+                int year = int.Parse(matche.Groups["year"].ToString());
+                int month = int.Parse(matche.Groups["month"].ToString());
+                int day = int.Parse(matche.Groups["day"].ToString());
+                int hour = int.Parse(matche.Groups["hour"].ToString());
+                int minute = int.Parse(matche.Groups["minute"].ToString());
+
+                //Console.WriteLine($"{year}-{month}-{day} {hour}:{minute}");
+
+                DateTime _dateTime = new DateTime(year, month, day, hour, minute, 0);
+                return _dateTime;
+            }
+            return DateTime.MinValue;
         }
     }
 }

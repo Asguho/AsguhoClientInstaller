@@ -14,23 +14,45 @@ namespace AsguhoClientInstaller {
     internal class Program {
         static void Main(string[] args) {
             Console.WriteLine("Setting up AsguhoClient!");
-            //Console.WriteLine(dateOnly.ToString("MM/dd/yyyy HH:mm"))
+            
             List<PathInfo> pathInfos = new List<PathInfo>();
-            HttpHelper.GetAllFilePathAndSubDirectory("https://www.asguho.dk/minecraft/client/", pathInfos);
-            HttpHelper.PrintAllPathInfo(pathInfos);
+            List<DownloadableFile> downloadableFiles = new List<DownloadableFile>();
+            HttpHelper.GetAllFilePathAndSubDirectory("https://www.asguho.dk/minecraft/client/1.18.2/", pathInfos);
+            pathInfos.ForEach(x => {
+                //Console.WriteLine($"File: {x.AbsoluteUrlStr} Date: {x.DateTime}");
+            }); 
 
-            FileInfo fi = new FileInfo(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\.asguho\\MultiMC\\instances\\testclient\\instance.cfg");
 
-            DateTime test = new DateTime(2022, 5, 11, 14, 41, 0);
-            Console.WriteLine();
-            Console.WriteLine(fi.LastWriteTime.CompareTo(test));
+            GetDownloadableFiles(downloadableFiles, pathInfos);
+
+            downloadableFiles.ForEach(x => Console.WriteLine($"url: {x.fileUrl}\npath: {x.filePath}"));
+
             //setup();
-
 
             Console.WriteLine("press any key to exit");
             Console.ReadKey();
         }
-
+        static void GetDownloadableFiles(List<DownloadableFile> downloadableFiles, List<PathInfo> pathInfos) {
+            foreach (var pathInfo in pathInfos) {
+                string localPath = pathInfo.AbsoluteUrlStr
+                    .Replace("https://www.asguho.dk/minecraft/client/1.18.2/", Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\.asguho\\MultiMC\\instances\\testclient\\")
+                    .Replace("_", ".")
+                    .Replace("/", "\\");
+                DateTime localDateTime = new FileInfo(localPath).LastWriteTime;
+                DateTime remoteDateTime = pathInfo.DateTime;
+                //Console.WriteLine($"local: {localDateTime}\nremote: {remoteDateTime}");
+                if (DateTime.Compare(localDateTime, remoteDateTime) < 0) {
+                    //Console.WriteLine($"{pathInfo.AbsoluteUrlStr} is newer than {localPath}");
+                    if (pathInfo.IsDir) {
+                        GetDownloadableFiles(downloadableFiles, pathInfo.Childs);
+                    }
+                    else {
+                        downloadableFiles.Add(new DownloadableFile(localPath, pathInfo.AbsoluteUrlStr));
+                    }
+                }
+            }
+        }
+        
         static void setup() {
             FolderUtil.createIfNone(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\.asguho");
             downloadMultiMC();
