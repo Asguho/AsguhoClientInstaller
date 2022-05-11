@@ -24,40 +24,50 @@ namespace Asguho.HttpLib {
             string rootUrl = baseUri.GetLeftPart(UriPartial.Authority);
 
 
-            Regex regexFile = new Regex("alt.*?></td><td><a href=\"(http:|https:)?(?<file>.*?)\"", RegexOptions.IgnoreCase);
-            Regex regexDir = new Regex("dir.*?></td><td><a href=\"(http:|https:)?(?<dir>.*?)\"", RegexOptions.IgnoreCase);
+            Regex regex = new Regex("alt.*?></td><td><a href=\"(http:|https:)?(?<url>.*?)\">(?<name>.*?)</a></td><td align=\"right\">(?<date>.*?)  </td>", RegexOptions.IgnoreCase);
 
             string html = ReadHtmlContentFromUrl(baseUrl);
             //Files         
-            MatchCollection matchesFile = regexFile.Matches(html);
-            if (matchesFile.Count != 0) {
-                foreach (Match match in matchesFile) {
+            MatchCollection matches = regex.Matches(html);
+            if (matches.Count != 0) {
+                foreach (Match match in matches) {
                     if (match.Success) {
-                        Console.WriteLine($"added file: " + match.Groups["file"].ToString());
-                        pathInfos.Add(new PathInfo(baseUrl + match.Groups["file"], false));
-                    }
-                }
-            }
-            //Dir
-            MatchCollection matchesDir = regexDir.Matches(html);
-            if (matchesDir.Count != 0) {
-                foreach (Match match in matchesDir) {
-                    if (match.Success) {
-                        if (match.Groups["dir"].ToString() != "/minecraft/") {
-                            Console.WriteLine("added dir: " + match.Groups["dir"].ToString());
-                            var dirInfo = new PathInfo(baseUrl + match.Groups["dir"], true);
-                            //GetAllFilePathAndSubDirectory(dirInfo.AbsoluteUrlStr, dirInfo.Childs);
+                        if (match.Groups["url"].Value.StartsWith("/")) {
+                            return; //parent directory
+                        }
+                        if (match.Groups["url"].Value.EndsWith("/")) { //its a directory
+                            //Console.WriteLine($"added dir: {match.Groups["url"]}\t filename: {match.Groups["name"]}\t date: {match.Groups["date"]}");
+                            var dirInfo = new PathInfo(baseUrl + match.Groups["url"], true, match.Groups["date"].ToString());
+                            GetAllFilePathAndSubDirectory(dirInfo.AbsoluteUrlStr, dirInfo.Childs);
                             pathInfos.Add(dirInfo);
+                        }
+                        else { // its a file
+                            //Console.WriteLine($"added file: {match.Groups["url"]}\t filename: {match.Groups["name"]}\t date: {match.Groups["date"]}");
+                            pathInfos.Add(new PathInfo(baseUrl + match.Groups["url"], false, match.Groups["date"].ToString()));
                         }
                     }
                 }
             }
+            //Dir
+            //MatchCollection matchesDir = regexDir.Matches(html);
+            //if (matchesDir.Count != 0) {
+            //    foreach (Match match in matchesDir) {
+            //        if (match.Success) {
+            //            if (match.Groups["dir"].ToString() != "/minecraft/") {
+            //                Console.WriteLine("added dir: " + match.Groups["dir"].ToString());
+            //                var dirInfo = new PathInfo(baseUrl + match.Groups["dir"], true);
+            //                //GetAllFilePathAndSubDirectory(dirInfo.AbsoluteUrlStr, dirInfo.Childs);
+            //                pathInfos.Add(dirInfo);
+            //            }
+            //        }
+            //    }
+            //}
         }
 
 
         public static void PrintAllPathInfo(List<PathInfo> pathInfos) {
             pathInfos.ForEach(f => {
-                Console.WriteLine(f.AbsoluteUrlStr);
+                Console.WriteLine($"Url: {f.AbsoluteUrlStr}\tDate: {f.Date}");
                 PrintAllPathInfo(f.Childs);
             });
         }
@@ -67,13 +77,16 @@ namespace Asguho.HttpLib {
 
 
     public class PathInfo {
-        public PathInfo(string absoluteUri, bool isDir) {
+        public PathInfo(string absoluteUri, bool isDir, string date) {
             AbsoluteUrl = new Uri(absoluteUri);
             IsDir = isDir;
             Childs = new List<PathInfo>();
+            Date = date;
         }
 
         public Uri AbsoluteUrl { get; set; }
+
+        public string Date { get; }
 
         public string AbsoluteUrlStr => AbsoluteUrl.ToString();
 

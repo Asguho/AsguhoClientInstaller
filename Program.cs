@@ -14,11 +14,16 @@ namespace AsguhoClientInstaller {
     internal class Program {
         static void Main(string[] args) {
             Console.WriteLine("Setting up AsguhoClient!");
-
+            //Console.WriteLine(dateOnly.ToString("MM/dd/yyyy HH:mm"))
             List<PathInfo> pathInfos = new List<PathInfo>();
             HttpHelper.GetAllFilePathAndSubDirectory("https://www.asguho.dk/minecraft/client/", pathInfos);
             HttpHelper.PrintAllPathInfo(pathInfos);
 
+            FileInfo fi = new FileInfo(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\.asguho\\MultiMC\\instances\\testclient\\instance.cfg");
+
+            DateTime test = new DateTime(2022, 5, 11, 14, 41, 0);
+            Console.WriteLine();
+            Console.WriteLine(fi.LastWriteTime.CompareTo(test));
             //setup();
 
 
@@ -40,14 +45,14 @@ namespace AsguhoClientInstaller {
             IShellLink link = (IShellLink)new ShellLink();
 
             // setup shortcut information
-            link.SetDescription("My Description");
-            link.SetPath(@"C:\Users\aske\AppData\Roaming\.asguho\MultiMC\MultiMC.exe");
+            link.SetDescription("launcher for AsguhoClient");
+            link.SetPath(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)+@"\.asguho\MultiMC\MultiMC.exe");
             link.SetArguments("-l testclient");
 
             // save it
             IPersistFile file = (IPersistFile)link;
             string desktopPath = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory);
-            file.Save(Path.Combine(desktopPath, "MyLink.lnk"), false);
+            file.Save(Path.Combine(desktopPath, "AsguhoClient.lnk"), false);
         }
 
         static void createInstance(string _instancesName) {
