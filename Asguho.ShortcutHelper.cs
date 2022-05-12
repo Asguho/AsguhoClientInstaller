@@ -1,8 +1,25 @@
 ﻿using System;
+using System.IO;
 using System.Runtime.InteropServices;
+using System.Runtime.InteropServices.ComTypes;
 using System.Text;
 
-namespace Asguho.ShortcutHelper {
+namespace AsguhoClientInstaller {
+
+    public class ShortcutHelper {
+        public static void CreateShortcut(string linkFileName, string targetPath, string arguments, string description) {
+            IShellLink link = (IShellLink)new ShellLink();
+
+            // setup shortcut information
+            link.SetDescription(description);
+            link.SetPath(targetPath);
+            link.SetArguments(arguments);
+
+            // save it
+            IPersistFile file = (IPersistFile)link;
+            file.Save(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory), linkFileName+".lnk"), false);
+        }
+    }
     [ComImport]
     [Guid("00021401-0000-0000-C000-000000000046")]
     public class ShellLink {

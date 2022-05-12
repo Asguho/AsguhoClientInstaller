@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Net;
 using System.Text.RegularExpressions;
 
-namespace Asguho.HttpLib {
+namespace AsguhoClientInstaller {
     public static class HttpHelper {
         public static string ReadHtmlContentFromUrl(string url) {
             string html = string.Empty;
@@ -58,8 +59,49 @@ namespace Asguho.HttpLib {
             });
         }
 
-    }
+        public static List<DownloadableFile> GetDownloadableFiles(string instanceName) {
+            List<PathInfo> pathInfos = new List<PathInfo>();
+            List<DownloadableFile> downloadableFiles = new List<DownloadableFile>();
+            GetAllFilePathAndSubDirectory("https://www.asguho.dk/minecraft/client/"+instanceName+"/", pathInfos);
+            PrintAllPathInfo(pathInfos);
+            downloadableFilesCrawler("https://www.asguho.dk/minecraft/client/" + instanceName + "/", Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + $"\\.asguho\\MultiMC\\instances\\{instanceName}\\",  downloadableFiles, pathInfos);
+            return downloadableFiles;
+        }
 
+        private static void downloadableFilesCrawler(string urlpath, string loaclpath, List<DownloadableFile> downloadableFiles, List<PathInfo> pathInfos) {
+            foreach (var pathInfo in pathInfos) {
+                string localPath = pathInfo.AbsoluteUrlStr
+                    .Replace(urlpath, loaclpath)
+                    .Replace("_", ".")
+                    .Replace("/", "\\");
+                DateTime localDateTime = new FileInfo(localPath).LastWriteTime;
+                DateTime remoteDateTime = pathInfo.DateTime;
+
+                //Console.WriteLine($"Url: {pathInfo.AbsoluteUrlStr}\tpath: {localPath}");
+                foreach (var item in pathInfo.Childs) {
+                    Console.WriteLine(item.AbsoluteUrlStr);
+                }
+                //Console.WriteLine($"local: {localDateTime}\nremote: {remoteDateTime}");
+                if (DateTime.Compare(localDateTime, remoteDateTime) < 0) {
+                    //Console.WriteLine($"{pathInfo.AbsoluteUrlStr} is newer than {localPath}");
+                    if (pathInfo.IsDir) {
+                        downloadableFilesCrawler(urlpath, loaclpath, downloadableFiles, pathInfo.Childs);
+                    }
+                    else {
+                        downloadableFiles.Add(new DownloadableFile(localPath, pathInfo.AbsoluteUrlStr));
+                    }
+                }
+            }
+        }
+    }
+    public class DownloadableFile {
+        public DownloadableFile(string filePath, string fileurl) {
+            this.filePath = filePath;
+            this.fileUrl = fileurl;
+        }
+        public string filePath { get; }
+        public string fileUrl { get; }
+    }
 
 
     public class PathInfo {

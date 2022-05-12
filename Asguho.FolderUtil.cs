@@ -1,6 +1,6 @@
 ﻿using System;
 using System.IO;
-namespace Asguho.FolderUtil {
+namespace AsguhoClientInstaller {
     public class FolderUtil {
         public static void createIfNone(string folderPath) {
             if (!Directory.Exists(folderPath)) {
@@ -65,12 +65,5 @@ namespace Asguho.FolderUtil {
             return _myTempDir;
         }
     }
-    class DownloadableFile {
-        public DownloadableFile(string filePath, string fileurl) {
-            this.filePath = filePath;
-            this.fileUrl = fileurl;
-        }
-        public string filePath { get; }
-        public string fileUrl { get; }
-    }
+
 }
